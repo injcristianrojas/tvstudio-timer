@@ -3,14 +3,12 @@
 import gi
 import sys
 import re
+import os
 from datetime import datetime, timedelta
 
 gi.require_version("Gtk", "3.0")
 gi.require_version("Pango", "1.0")
 from gi.repository import Gtk, GLib, Pango, Gdk, Gio
-
-# Resolve deprecations: https://g.co/gemini/share/840e5f430f13
-
 
 def parse_command_line_args():
     if len(sys.argv) > 1:
@@ -41,7 +39,7 @@ def parse_command_line_args():
                 sys.exit(1)
         return end_time
     else:
-        print("Please enter a date/time.")
+        print('Please enter a date/time. Supported formats: "HH:MM", "YYYY-MM-DD HH:MM:SS"')
         sys.exit(1)
 
 
@@ -54,7 +52,7 @@ class ClockWindow(Gtk.Window):
         # Load CSS from a string (or file)
         css_provider = Gtk.CssProvider()
         css_provider.load_from_file(
-            Gio.File.new_for_path("/var/home/cristian/tools/timer/style.css")
+            Gio.File.new_for_path(os.path.dirname(os.path.realpath(__file__)) + '/style.css')
         )
 
         # Create labels for the clocks
