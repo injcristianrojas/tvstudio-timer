@@ -1,0 +1,13 @@
+label {
+    color: white;
+    font-family: "alarm clock";
+    font-size: 200px;
+}
+
+separator {
+    background-color: white;
+}
+
+window {
+    background-color: black;
+}
