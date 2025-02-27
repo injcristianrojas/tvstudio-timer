@@ -3,7 +3,7 @@ the TV networks use to control broadcast times.
 
 Python 3 supported, and works on GNOME 47. Requires the
 [Alarm Clock font](https://www.dafont.com/alarm-clock.font), but you can use
-any digital font you want. Only change the font name in style.css.
+any digital font you want. Just change the `font-family` in `style.css`.
 
 Launch using:
 
