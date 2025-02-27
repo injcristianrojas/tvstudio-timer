@@ -10,6 +10,7 @@ gi.require_version("Gtk", "3.0")
 gi.require_version("Pango", "1.0")
 from gi.repository import Gtk, GLib, Pango, Gdk, Gio
 
+
 def parse_command_line_args():
     if len(sys.argv) > 1:
         time_str = sys.argv[1]
@@ -39,7 +40,9 @@ def parse_command_line_args():
                 sys.exit(1)
         return end_time
     else:
-        print('Please enter a date/time. Supported formats: "HH:MM", "YYYY-MM-DD HH:MM:SS"')
+        print(
+            'Please enter a date/time. Supported formats: "HH:MM", "YYYY-MM-DD HH:MM:SS"'
+        )
         sys.exit(1)
 
 
@@ -52,7 +55,9 @@ class ClockWindow(Gtk.Window):
         # Load CSS from a string (or file)
         css_provider = Gtk.CssProvider()
         css_provider.load_from_file(
-            Gio.File.new_for_path(os.path.dirname(os.path.realpath(__file__)) + '/style.css')
+            Gio.File.new_for_path(
+                os.path.dirname(os.path.realpath(__file__)) + "/style.css"
+            )
         )
 
         # Create labels for the clocks
@@ -74,8 +79,9 @@ class ClockWindow(Gtk.Window):
         )
 
         # Set initial time
-        self.top_clock_label.set_text(self.get_current_time())
-        self.bottom_clock_label.set_text(self.get_time_remaining_hours())
+        current_time, remaining_time = self.get_times()
+        self.top_clock_label.set_text(current_time)
+        self.bottom_clock_label.set_text(remaining_time)
 
         # Create a vertical box layout
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
@@ -95,22 +101,20 @@ class ClockWindow(Gtk.Window):
         )
 
         # Schedule the clock update using GLib.timeout_add
-        self.timeout_id = GLib.timeout_add(1000, self.update_clock, None)
+        self.timeout_id = GLib.timeout_add(1000, self.update_clock)
 
-    def update_clock(self, user_data):
-        current_time = self.get_current_time()
+    def update_clock(self):
+        current_time, remaining_time = self.get_times()
         self.top_clock_label.set_text(current_time)
-        self.bottom_clock_label.set_text(self.get_time_remaining_hours())
+        self.bottom_clock_label.set_text(remaining_time)
         return True
 
-    def get_current_time(self):
+    def get_times(self):
         now = datetime.now()
-        return now.strftime("%H:%M:%S")
-
-    def get_time_remaining_hours(self):
-        time_left = self.end_time - datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        time_left = self.end_time - now
         if time_left.total_seconds() <= 0:
-            return "00:00:00"
+            remaining_time = "00:00:00"
         else:
             total_hours = time_left.total_seconds() / 3600
             hours = int(total_hours)
@@ -118,7 +122,8 @@ class ClockWindow(Gtk.Window):
             seconds = int(((total_hours - hours) * 60 - minutes) * 60) + 1
             if seconds >= 60:
                 seconds = 0
-            return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+            remaining_time = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        return current_time, remaining_time
 
     def destroy(self):
         # Cancel the timeout when the window is closed
