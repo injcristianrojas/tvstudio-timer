@@ -48,7 +48,7 @@ def parse_command_line_args():
 
 class ClockWindow(Gtk.Window):
     def __init__(self, end_time):
-        super().__init__(title="Timer")
+        super().__init__(title="Timer ending at {}".format(end_time.strftime("%H:%M")))
 
         self.end_time = end_time
 
