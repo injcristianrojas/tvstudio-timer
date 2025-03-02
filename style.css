@@ -1,7 +1,14 @@
-label {
-    color: white;
+.white, .red {
     font-family: "alarm clock";
     font-size: 200px;
+}
+
+.white {
+    color: white;
+}
+
+.red {
+    color: red;
 }
 
 separator {

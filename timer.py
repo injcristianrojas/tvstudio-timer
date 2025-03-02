@@ -80,11 +80,13 @@ class ClockWindow(Gtk.Window):
         self.top_clock_label.get_style_context().add_provider(
             css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
+        self.top_clock_label.get_style_context().add_class("white")
         self.bottom_clock_label = Gtk.Label()
         self.bottom_clock_label.set_justify(Gtk.Justification.CENTER)
         self.bottom_clock_label.get_style_context().add_provider(
             css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
+        self.bottom_clock_label.get_style_context().add_class("white")
 
         # Create a separator
         separator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
@@ -129,6 +131,7 @@ class ClockWindow(Gtk.Window):
         time_left = self.end_time - now
         if time_left.total_seconds() <= 0:
             remaining_time = "00:00:00"
+            self.bottom_clock_label.get_style_context().add_class("red")
         else:
             total_hours = time_left.total_seconds() / 3600
             hours = int(total_hours)
