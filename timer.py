@@ -4,6 +4,7 @@ import gi
 import sys
 import re
 import os
+import time
 from datetime import datetime, timedelta
 
 gi.require_version("Gtk", "3.0")
@@ -44,6 +45,19 @@ def parse_command_line_args():
             'Please enter a date/time. Supported formats: "HH:MM", "YYYY-MM-DD HH:MM:SS"'
         )
         sys.exit(1)
+
+
+def wait_until_next_second():
+    # Wait until the following second
+    now = time.time()
+    next_second = int(now) + 1
+    sleep_time = next_second - now
+    print(
+        "Waiting {} seconds until the next second in time... ".format(sleep_time),
+        end="",
+    )
+    time.sleep(sleep_time)
+    print("Launching timer.")
 
 
 class ClockWindow(Gtk.Window):
@@ -132,6 +146,7 @@ class ClockWindow(Gtk.Window):
 
 
 if __name__ == "__main__":
+    wait_until_next_second()
     win = ClockWindow(parse_command_line_args())
     win.connect("destroy", Gtk.main_quit)
     win.show_all()
