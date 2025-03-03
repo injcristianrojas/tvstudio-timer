@@ -66,31 +66,30 @@ class ClockWindow(Gtk.Window):
 
         self.end_time = end_time
 
-        # Load CSS from a string (or file)
+        # Load UI from glade file
+        builder = Gtk.Builder()
+        try:
+            builder.add_from_file("timer.glade")
+        except Exception as ex:
+            print(f"Error loading Glade file: {ex}")
+            exit(1)
+        self.separator = builder.get_object("separator")
+        self.top_clock_label = builder.get_object("top_clock_label")
+        self.bottom_clock_label = builder.get_object("bottom_clock_label")
+
         css_provider = Gtk.CssProvider()
         css_provider.load_from_file(
             Gio.File.new_for_path(
                 os.path.dirname(os.path.realpath(__file__)) + "/style.css"
             )
         )
-
-        # Create labels for the clocks
-        self.top_clock_label = Gtk.Label()
-        self.top_clock_label.set_justify(Gtk.Justification.CENTER)
+        self.separator.get_style_context().add_provider(
+            css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
         self.top_clock_label.get_style_context().add_provider(
             css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
-        self.top_clock_label.get_style_context().add_class("white")
-        self.bottom_clock_label = Gtk.Label()
-        self.bottom_clock_label.set_justify(Gtk.Justification.CENTER)
         self.bottom_clock_label.get_style_context().add_provider(
-            css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        )
-        self.bottom_clock_label.get_style_context().add_class("white")
-
-        # Create a separator
-        separator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
-        separator.get_style_context().add_provider(
             css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
@@ -98,23 +97,6 @@ class ClockWindow(Gtk.Window):
         current_time, remaining_time = self.get_times()
         self.top_clock_label.set_text(current_time)
         self.bottom_clock_label.set_text(remaining_time)
-
-        # Create a vertical box layout
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        vbox.pack_start(self.top_clock_label, True, True, 0)
-        vbox.pack_start(separator, False, False, 0)  # Add the separator
-        vbox.pack_start(self.bottom_clock_label, True, True, 0)
-
-        # Add the box layout to the window
-        self.add(vbox)
-
-        # Set initial window size
-        self.set_default_size(1000, 400)
-
-        # Set window background color to black (using Gdk.RGBA)
-        self.get_style_context().add_provider(
-            css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        )
 
         # Schedule the clock update using GLib.timeout_add
         self.timeout_id = GLib.timeout_add(1000, self.update_clock)
