@@ -13,47 +13,26 @@ from gi.repository import Gtk, GLib, Pango, Gdk, Gio
 
 
 def parse_command_line_args():
-    if len(sys.argv) > 1:
-        time_str = sys.argv[1]
-
-        if re.match(r"^\d{2}:\d{2}$", time_str):
-            try:
-                hour, minute = map(int, time_str.split(":"))
-                # Create a datetime object for today at the specified time
-                today = datetime.now()
-                end_time = today.replace(hour=hour, minute=minute, second=0)
-                # Ensure the end time is in the future
-                if end_time <= today:
-                    end_time += timedelta(
-                        days=1
-                    )  # Set it for tomorrow if it's already past today
-            except ValueError:
-                print("Invalid time format. Please use HH:MM (e.g., 23:59).")
-                sys.exit(1)
-        else:
-            try:
-                # Attempt to parse the provided argument as a datetime string
-                end_time = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
-            except ValueError:
-                print(
-                    "Invalid time format. Please use YYYY-MM-DD HH:MM:SS (e.g., 2024-12-31 23:59:59) or HH:MM (e.g., 23:59)."
-                )
-                sys.exit(1)
-        return end_time
+    time_str = sys.argv[1]
+    if re.match(r"^\d{2}:\d{2}$", time_str):
+        hour, minute = map(int, time_str.split(":"))
+        today = datetime.now()
+        end_time = today.replace(hour=hour, minute=minute, second=0)
+        if end_time <= today:
+            end_time += timedelta(days=1)
     else:
-        print(
-            'Please enter a date/time. Supported formats: "HH:MM", "YYYY-MM-DD HH:MM:SS"'
-        )
-        sys.exit(1)
+        end_time = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
+    return end_time
 
 
 def wait_until_next_second():
-    # Wait until the following second
     now = time.time()
     next_second = int(now) + 1
     sleep_time = next_second - now
     print(
-        "Waiting {} seconds until the next second in time... ".format(sleep_time),
+        "Syncing... waiting {} seconds until the next second in time... ".format(
+            sleep_time
+        ),
         end="",
     )
     time.sleep(sleep_time)
@@ -105,18 +84,12 @@ class ClockWindow(Gtk.Window):
         vbox.pack_start(separator, False, False, 0)  # Add the separator
         vbox.pack_start(self.bottom_clock_label, True, True, 0)
 
-        # Add the box layout to the window
         self.add(vbox)
-
-        # Set initial window size
         self.set_default_size(1000, 400)
-
-        # Set window background color to black (using Gdk.RGBA)
         self.get_style_context().add_provider(
             css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
-        # Schedule the clock update using GLib.timeout_add
         self.timeout_id = GLib.timeout_add(1000, self.update_clock)
 
     def update_clock(self):
@@ -136,21 +109,30 @@ class ClockWindow(Gtk.Window):
             total_hours = time_left.total_seconds() / 3600
             hours = int(total_hours)
             minutes = int((total_hours - hours) * 60)
-            seconds = int(((total_hours - hours) * 60 - minutes) * 60) + 1
+            seconds = int(((total_hours - hours) * 60 - minutes) * 60)
             if seconds >= 60:
                 seconds = 0
             remaining_time = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
         return current_time, remaining_time
 
     def destroy(self):
-        # Cancel the timeout when the window is closed
         GLib.source_remove(self.timeout_id)
         super().destroy()
 
 
 if __name__ == "__main__":
+    try:
+        target_time = parse_command_line_args()
+    except IndexError:
+        print("Missing argument. Please specify time.")
+        sys.exit(1)
+    except ValueError:
+        print(
+            "Invalid time format. Please use YYYY-MM-DD HH:MM:SS (e.g., 2024-12-31 23:59:59) or HH:MM (e.g., 23:59)."
+        )
+        sys.exit(1)
     wait_until_next_second()
-    win = ClockWindow(parse_command_line_args())
+    win = ClockWindow(target_time)
     win.connect("destroy", Gtk.main_quit)
     win.show_all()
     Gtk.main()
