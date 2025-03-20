@@ -30,7 +30,7 @@ def wait_until_next_second():
     next_second = int(now) + 1
     sleep_time = next_second - now
     print(
-        "Syncing... waiting {} seconds until the next second in time... ".format(
+        "Syncing... waiting {0:.2f} seconds until the next second in time... ".format(
             sleep_time
         ),
         end="",
