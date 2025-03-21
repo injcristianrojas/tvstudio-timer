@@ -100,8 +100,10 @@ class ClockWindow(Gtk.Window):
 
     def get_times(self):
         now = datetime.now()
+        now = now.replace(microsecond=0)
         current_time = now.strftime("%H:%M:%S")
         time_left = self.end_time - now
+        # print("{} - {}".format(now, time_left))
         if time_left.total_seconds() <= 0:
             remaining_time = "00:00:00"
             self.bottom_clock_label.get_style_context().add_class("red")
