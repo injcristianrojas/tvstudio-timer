@@ -46,31 +46,27 @@ class ClockWindow(Gtk.Window):
         self.end_time = end_time
 
         # Load CSS from a string (or file)
-        css_provider = Gtk.CssProvider()
-        css_provider.load_from_file(
-            Gio.File.new_for_path(
-                os.path.dirname(os.path.realpath(__file__)) + "/style.css"
-            )
-        )
+        self.css_provider = Gtk.CssProvider()
+        self.set_style(200)
 
         # Create labels for the clocks
         self.top_clock_label = Gtk.Label()
         self.top_clock_label.set_justify(Gtk.Justification.CENTER)
         self.top_clock_label.get_style_context().add_provider(
-            css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
         self.top_clock_label.get_style_context().add_class("white")
         self.bottom_clock_label = Gtk.Label()
         self.bottom_clock_label.set_justify(Gtk.Justification.CENTER)
         self.bottom_clock_label.get_style_context().add_provider(
-            css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
         self.bottom_clock_label.get_style_context().add_class("white")
 
         # Create a separator
         separator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
         separator.get_style_context().add_provider(
-            css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
         # Set initial time
@@ -87,10 +83,44 @@ class ClockWindow(Gtk.Window):
         self.add(vbox)
         self.set_default_size(1000, 400)
         self.get_style_context().add_provider(
-            css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
         self.timeout_id = GLib.timeout_add(1000, self.update_clock)
+
+        self.connect("size-allocate", self.on_size_allocate)
+    
+    def on_size_allocate(self, widget, allocation):
+        width = allocation.width
+        height = allocation.height
+        font_size = min(width, height) * 0.4
+        self.set_style(font_size)
+    
+    def set_style(self, font_size):
+        css = f"""
+            label {{
+                font-family: "alarm clock";
+                font-size: {font_size}px;
+            }}
+
+            .white {{
+                color: white;
+            }}
+
+            .red {{
+                color: red;
+            }}
+
+            separator {{
+                background-color: white;
+            }}
+
+            window {{
+                background-color: black;
+            }}
+        """
+        self.css_provider.load_from_data(css.encode())
+
 
     def update_clock(self):
         current_time, remaining_time = self.get_times()
