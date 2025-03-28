@@ -3,7 +3,6 @@
 import gi
 import sys
 import re
-import os
 import time
 from datetime import datetime, timedelta
 
@@ -89,13 +88,13 @@ class ClockWindow(Gtk.Window):
         self.timeout_id = GLib.timeout_add(1000, self.update_clock)
 
         self.connect("size-allocate", self.on_size_allocate)
-    
+
     def on_size_allocate(self, widget, allocation):
         width = allocation.width
         height = allocation.height
         font_size = min(width, height) * 0.4
         self.set_style(font_size)
-    
+
     def set_style(self, font_size):
         css = f"""
             label {{
@@ -120,7 +119,6 @@ class ClockWindow(Gtk.Window):
             }}
         """
         self.css_provider.load_from_data(css.encode())
-
 
     def update_clock(self):
         current_time, remaining_time = self.get_times()
