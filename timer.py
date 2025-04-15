@@ -44,8 +44,6 @@ class ClockWindow(Gtk.Window):
 
         self.end_time = end_time
 
-        self.START_HEIGHT = 1024
-
         # Load CSS from a string (or file)
         self.css_provider = Gtk.CssProvider()
         self.set_style(190)
