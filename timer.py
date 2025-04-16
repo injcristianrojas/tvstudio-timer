@@ -46,7 +46,6 @@ class ClockWindow(Gtk.Window):
 
         # Load CSS from a string (or file)
         self.css_provider = Gtk.CssProvider()
-        self.set_style(190)
 
         # Create labels for the clocks
         self.top_clock_label = Gtk.Label()
@@ -80,7 +79,6 @@ class ClockWindow(Gtk.Window):
         vbox.pack_start(self.bottom_clock_label, True, True, 0)
 
         self.add(vbox)
-        self.set_default_size(1024, 512)
         self.get_style_context().add_provider(
             self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
@@ -93,7 +91,7 @@ class ClockWindow(Gtk.Window):
         # width = allocation.width
         height = allocation.height
         # print(width, height)
-        self.set_style(25 * height / 66)
+        self.set_style(25 * height / 70)
 
     def set_style(self, font_size):
         css = f"""
